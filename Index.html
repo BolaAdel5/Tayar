@@ -51,6 +51,7 @@ font-size:18px;
 </head>
 
 <body>
+<body>
 
 <div class="box">
 
@@ -66,55 +67,21 @@ font-size:18px;
 
 </div>
 
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
 <script>
 
-const supabase = window.supabase.createClient(
+alert("JS WORKING");
 
-'https://ckxljrwcsjmdflxyxxoc.supabase.co',
+const btn =
+document.getElementById("sendBtn");
 
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0'
+btn.addEventListener("click", ()=>{
 
-);
-
-async function createOrder(){
-
-navigator.geolocation.getCurrentPosition(async(pos)=>{
-
-const orderNumber =
-Math.floor(1000 + Math.random()*9000);
-
-await supabase
-.from('orders')
-.insert([{
-
-order_number: orderNumber,
-
-customer_name:
-document.getElementById('name').value,
-
-phone:
-document.getElementById('phone').value,
-
-customer_lat:
-pos.coords.latitude,
-
-customer_lng:
-pos.coords.longitude
-
-}]);
-
-
-window.location =
-`track.html?order=${orderNumber}`;
+alert("BUTTON WORKING");
 
 });
 
-}
-  document
-.getElementById('sendBtn')
-.addEventListener('click', createOrder);
-console.log("WORKING");
-alert("JS WORKING");
 </script>
 
 </body>
