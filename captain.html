@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+
+<meta charset="UTF-8">
+
+<title>الكابتن</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+padding:20px;
+direction:rtl;
+}
+
+.card{
+padding:20px;
+border:1px solid #ddd;
+margin-bottom:20px;
+}
+
+button{
+padding:10px;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+<body>
+
+<h2>الطلبات</h2>
+
+<div id="orders"></div>
+
+<script>
+
+const supabase = window.supabase.createClient(
+'https://supabase.com/dashboard/project/ckxljrwcsjmdflxyxxoc',
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0'
+);
+
+async function loadOrders(){
+
+const { data } = await supabase
+.from('orders')
+.select('*')
+.order('id',{ascending:false});
+
+document.getElementById('orders').innerHTML='';
+
+data.forEach(order=>{
+
+document.getElementById('orders').innerHTML += `
+
+<div class="card">
+
+<h3>#${order.order_number}</h3>
+
+<p>${order.customer_name}</p>
+
+<p>${order.status}</p>
+
+<button onclick="startDelivery(${order.id})">
+جاري التوصيل
+</button>
+
+<button onclick="delivered(${order.id})">
+تم التوصيل
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+async function startDelivery(id){
+
+await supabase
+.from('orders')
+.update({
+status:'On The Way'
+})
+.eq('id',id);
+
+navigator.geolocation.watchPosition(
+async(pos)=>{
+
+await supabase
+.from('orders')
+.update({
+
+driver_lat: pos.coords.latitude,
+driver_lng: pos.coords.longitude
+
+})
+.eq('id',id);
+
+}
+);
+
+}
+
+async function delivered(id){
+
+await supabase
+.from('orders')
+.update({
+status:'Delivered'
+})
+.eq('id',id);
+
+alert('تم التوصيل');
+
+}
+
+loadOrders();
+
+setInterval(loadOrders,5000);
+
+</script>
+
+</body>
+</html>
