@@ -60,7 +60,7 @@ font-size:18px;
 
 <input id="phone" placeholder="رقم الهاتف">
 
-<button onclick="createOrder()">
+<button id="sendBtn">
 إرسال الطلب
 </button>
 
@@ -110,6 +110,9 @@ window.location =
 });
 
 }
+  document
+.getElementById('sendBtn')
+.addEventListener('click', createOrder);
 
 </script>
 
