@@ -43,6 +43,10 @@ border-radius:10px;
 
 z-index:999;
 
+font-size:18px;
+
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+
 }
 
 </style>
@@ -89,6 +93,7 @@ let marker;
 async function loadOrder(){
 
 const { data,error } =
+
 await client
 
 .from('orders')
@@ -122,7 +127,11 @@ return;
 document.getElementById('status')
 .innerHTML = data.status;
 
-if(data.driver_lat){
+if(
+data.status !== 'Delivered'
+&&
+data.driver_lat
+){
 
 const latlng = [
 data.driver_lat,
@@ -142,6 +151,18 @@ L.marker(latlng)
 }
 
 map.setView(latlng,15);
+
+}
+
+if(data.status === 'Delivered'){
+
+if(marker){
+
+map.removeLayer(marker);
+
+marker = null;
+
+}
 
 }
 
