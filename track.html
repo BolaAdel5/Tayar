@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar">
+
 <head>
 
 <meta charset="UTF-8">
@@ -30,17 +31,17 @@ height:100vh;
 .status{
 
 position:fixed;
+
 top:20px;
 right:20px;
 
 background:white;
+
 padding:15px;
 
 border-radius:10px;
 
 z-index:999;
-
-font-size:18px;
 
 }
 
@@ -58,22 +59,26 @@ font-size:18px;
 
 <script>
 
-const supabase = window.supabase.createClient(
+const supabaseUrl =
+'https://ckxljrwcsjmdflxyxxoc.supabase.co';
 
-'https://ckxljrwcsjmdflxyxxoc.supabase.co',
+const supabaseKey =
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0';
 
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0'
-
+const client =
+supabase.createClient(
+supabaseUrl,
+supabaseKey
 );
 
 const params =
 new URLSearchParams(window.location.search);
 
-const order =
+const orderNumber =
 params.get('order');
 
 const map =
-L.map('map').setView([30,31],13);
+L.map('map').setView([30.0444,31.2357],13);
 
 L.tileLayer(
 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -83,44 +88,60 @@ let marker;
 
 async function loadOrder(){
 
-const { data } =
-await supabase
+const { data,error } =
+await client
 
 .from('orders')
 
 .select('*')
 
-.eq('order_number',order)
+.eq('order_number',orderNumber)
 
 .single();
 
-if(!data) return;
+console.log(data,error);
+
+if(error){
+
+document.getElementById('status')
+.innerHTML = error.message;
+
+return;
+
+}
+
+if(!data){
+
+document.getElementById('status')
+.innerHTML = 'الطلب غير موجود';
+
+return;
+
+}
 
 document.getElementById('status')
 .innerHTML = data.status;
 
 if(data.driver_lat){
 
-if(marker){
-
-marker.setLatLng([
+const latlng = [
 data.driver_lat,
 data.driver_lng
-]);
+];
+
+if(marker){
+
+marker.setLatLng(latlng);
 
 }else{
 
-marker = L.marker([
-data.driver_lat,
-data.driver_lng
-]).addTo(map);
+marker =
+L.marker(latlng)
+.addTo(map);
 
 }
 
-map.setView([
-data.driver_lat,
-data.driver_lng
-],15);
+map.setView(latlng,15);
 
 }
 
