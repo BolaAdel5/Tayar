@@ -4,7 +4,10 @@
 
 <meta charset="UTF-8">
 
-<title>الكابتن</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>لوحة الكابتن</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
@@ -14,22 +17,46 @@ body{
 font-family:Arial;
 padding:20px;
 direction:rtl;
+background:#f5f5f5;
 }
 
 .card{
+
+background:white;
 padding:20px;
-border:1px solid #ddd;
+border-radius:20px;
+
 margin-bottom:20px;
+
 }
 
 button{
-padding:10px;
+
+padding:15px;
+border:none;
+
+border-radius:10px;
+
 margin-top:10px;
+
+font-size:16px;
+
+}
+
+.green{
+background:green;
+color:white;
+}
+
+.black{
+background:black;
+color:white;
 }
 
 </style>
 
 </head>
+
 <body>
 
 <h2>الطلبات</h2>
@@ -39,15 +66,23 @@ margin-top:10px;
 <script>
 
 const supabase = window.supabase.createClient(
-'https://supabase.com/dashboard/project/ckxljrwcsjmdflxyxxoc',
+
+'https://ckxljrwcsjmdflxyxxoc.supabase.co',
+
 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0'
+
 );
+
+let watchId;
 
 async function loadOrders(){
 
 const { data } = await supabase
+
 .from('orders')
+
 .select('*')
+
 .order('id',{ascending:false});
 
 document.getElementById('orders').innerHTML='';
@@ -58,18 +93,26 @@ document.getElementById('orders').innerHTML += `
 
 <div class="card">
 
-<h3>#${order.order_number}</h3>
+<h3>طلب #${order.order_number}</h3>
 
 <p>${order.customer_name}</p>
 
+<p>${order.phone}</p>
+
 <p>${order.status}</p>
 
-<button onclick="startDelivery(${order.id})">
+<button class="black"
+onclick="startDelivery(${order.id})">
+
 جاري التوصيل
+
 </button>
 
-<button onclick="delivered(${order.id})">
+<button class="green"
+onclick="delivered(${order.id})">
+
 تم التوصيل
+
 </button>
 
 </div>
@@ -83,37 +126,58 @@ document.getElementById('orders').innerHTML += `
 async function startDelivery(id){
 
 await supabase
+
 .from('orders')
+
 .update({
 status:'On The Way'
 })
+
 .eq('id',id);
 
+watchId =
 navigator.geolocation.watchPosition(
+
 async(pos)=>{
 
 await supabase
+
 .from('orders')
+
 .update({
 
-driver_lat: pos.coords.latitude,
-driver_lng: pos.coords.longitude
+driver_lat:
+pos.coords.latitude,
+
+driver_lng:
+pos.coords.longitude
 
 })
+
 .eq('id',id);
 
 }
+
 );
+
+alert('بدأ التتبع');
 
 }
 
 async function delivered(id){
 
+navigator.geolocation.clearWatch(watchId);
+
 await supabase
+
 .from('orders')
+
 .update({
+
 status:'Delivered'
+
 })
+
 .eq('id',id);
 
 alert('تم التوصيل');
