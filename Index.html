@@ -1,73 +1,108 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
+
 <meta charset="UTF-8">
-<title>طلب جديد</title>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>طيار</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <style>
+
 body{
 font-family:Arial;
 padding:20px;
 direction:rtl;
+background:#f5f5f5;
+}
+
+.box{
+max-width:400px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:20px;
 }
 
 input{
 width:100%;
-padding:10px;
-margin:10px 0;
+padding:15px;
+margin-top:10px;
+border-radius:10px;
+border:1px solid #ddd;
 }
 
 button{
 width:100%;
 padding:15px;
+margin-top:15px;
+border:none;
 background:black;
 color:white;
-border:none;
+border-radius:10px;
+font-size:18px;
 }
+
 </style>
 
 </head>
+
 <body>
+
+<div class="box">
 
 <h2>إنشاء طلب</h2>
 
 <input id="name" placeholder="الاسم">
+
 <input id="phone" placeholder="رقم الهاتف">
 
 <button onclick="createOrder()">
 إرسال الطلب
 </button>
 
+</div>
+
 <script>
 
 const supabase = window.supabase.createClient(
-'https://supabase.com/dashboard/project/ckxljrwcsjmdflxyxxoc',
+
+'https://ckxljrwcsjmdflxyxxoc.supabase.co',
+
 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0'
+
 );
 
 async function createOrder(){
 
 navigator.geolocation.getCurrentPosition(async(pos)=>{
 
-const lat = pos.coords.latitude;
-const lng = pos.coords.longitude;
+const orderNumber =
+Math.floor(1000 + Math.random()*9000);
 
-const orderNumber = Math.floor(1000 + Math.random()*9000);
-
-const { data,error } = await supabase
+await supabase
 .from('orders')
 .insert([{
 
 order_number: orderNumber,
-customer_name: document.getElementById('name').value,
-phone: document.getElementById('phone').value,
 
-customer_lat: lat,
-customer_lng: lng
+customer_name:
+document.getElementById('name').value,
 
-}])
+phone:
+document.getElementById('phone').value,
+
+customer_lat:
+pos.coords.latitude,
+
+customer_lng:
+pos.coords.longitude
+
+}]);
 
 
 window.location =
