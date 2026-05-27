@@ -4,6 +4,9 @@
 
 <meta charset="UTF-8">
 
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
 <title>تتبع الطلب</title>
 
 <link rel="stylesheet"
@@ -25,18 +28,26 @@ height:100vh;
 }
 
 .status{
+
 position:fixed;
 top:20px;
 right:20px;
+
 background:white;
-padding:10px;
-z-index:999;
+padding:15px;
+
 border-radius:10px;
+
+z-index:999;
+
+font-size:18px;
+
 }
 
 </style>
 
 </head>
+
 <body>
 
 <div class="status" id="status">
@@ -48,8 +59,11 @@ border-radius:10px;
 <script>
 
 const supabase = window.supabase.createClient(
-'https://supabase.com/dashboard/project/ckxljrwcsjmdflxyxxoc',
+
+'https://ckxljrwcsjmdflxyxxoc.supabase.co',
+
 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0'
+
 );
 
 const params =
@@ -58,37 +72,45 @@ new URLSearchParams(window.location.search);
 const order =
 params.get('order');
 
-const map = L.map('map').setView([30,31],13);
+const map =
+L.map('map').setView([30,31],13);
 
 L.tileLayer(
 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 ).addTo(map);
 
-let driverMarker;
+let marker;
 
 async function loadOrder(){
 
-const { data } = await supabase
+const { data } =
+await supabase
+
 .from('orders')
+
 .select('*')
+
 .eq('order_number',order)
+
 .single();
+
+if(!data) return;
 
 document.getElementById('status')
 .innerHTML = data.status;
 
 if(data.driver_lat){
 
-if(driverMarker){
+if(marker){
 
-driverMarker.setLatLng([
+marker.setLatLng([
 data.driver_lat,
 data.driver_lng
 ]);
 
 }else{
 
-driverMarker = L.marker([
+marker = L.marker([
 data.driver_lat,
 data.driver_lng
 ]).addTo(map);
