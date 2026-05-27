@@ -82,12 +82,12 @@ const orderNumber =
 params.get('order');
 
 const map =
-L.map('map').setView([30.0444,31.2357],13);
-
 L.tileLayer(
-'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+{
+attribution:'© Stadia Maps © OpenMapTiles © OpenStreetMap'
+}
 ).addTo(map);
-
 let marker;
 
 async function loadOrder(){
