@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar">
+
 <head>
 
 <meta charset="UTF-8">
@@ -7,7 +8,7 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>لوحة الكابتن</title>
+<title>الكابتن</title>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
@@ -24,6 +25,7 @@ background:#f5f5f5;
 
 background:white;
 padding:20px;
+
 border-radius:20px;
 
 margin-bottom:20px;
@@ -33,24 +35,26 @@ margin-bottom:20px;
 button{
 
 padding:15px;
+margin-top:10px;
+
 border:none;
 
 border-radius:10px;
 
-margin-top:10px;
+color:white;
 
 font-size:16px;
 
+width:100%;
+
 }
 
-.green{
-background:green;
-color:white;
-}
-
-.black{
+.start{
 background:black;
-color:white;
+}
+
+.done{
+background:green;
 }
 
 </style>
@@ -65,19 +69,24 @@ color:white;
 
 <script>
 
-const supabase = window.supabase.createClient(
+const supabaseUrl =
+'https://ckxljrwcsjmdflxyxxoc.supabase.co';
 
-'https://ckxljrwcsjmdflxyxxoc.supabase.co',
+const supabaseKey =
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0';
 
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0'
-
+const client =
+supabase.createClient(
+supabaseUrl,
+supabaseKey
 );
 
 let watchId;
 
 async function loadOrders(){
 
-const { data } = await supabase
+const { data } =
+await client
 
 .from('orders')
 
@@ -85,11 +94,13 @@ const { data } = await supabase
 
 .order('id',{ascending:false});
 
-document.getElementById('orders').innerHTML='';
+document.getElementById('orders')
+.innerHTML='';
 
 data.forEach(order=>{
 
-document.getElementById('orders').innerHTML += `
+document.getElementById('orders')
+.innerHTML += `
 
 <div class="card">
 
@@ -101,14 +112,14 @@ document.getElementById('orders').innerHTML += `
 
 <p>${order.status}</p>
 
-<button class="black"
+<button class="start"
 onclick="startDelivery(${order.id})">
 
 جاري التوصيل
 
 </button>
 
-<button class="green"
+<button class="done"
 onclick="delivered(${order.id})">
 
 تم التوصيل
@@ -123,9 +134,10 @@ onclick="delivered(${order.id})">
 
 }
 
-async function startDelivery(id){
+window.startDelivery =
+async function(id){
 
-await supabase
+await client
 
 .from('orders')
 
@@ -138,19 +150,19 @@ status:'On The Way'
 watchId =
 navigator.geolocation.watchPosition(
 
-async(pos)=>{
+async(position)=>{
 
-await supabase
+await client
 
 .from('orders')
 
 .update({
 
 driver_lat:
-pos.coords.latitude,
+position.coords.latitude,
 
 driver_lng:
-pos.coords.longitude
+position.coords.longitude
 
 })
 
@@ -164,31 +176,14 @@ alert('بدأ التتبع');
 
 }
 
-async function delivered(id){
+window.delivered =
+async function(id){
 
 navigator.geolocation.clearWatch(watchId);
 
-await supabase
+await client
 
 .from('orders')
 
 .update({
-
-status:'Delivered'
-
-})
-
-.eq('id',id);
-
-alert('تم التوصيل');
-
-}
-
-loadOrders();
-
-setInterval(loadOrders,5000);
-
-</script>
-
-</body>
-</html>
+status:'
