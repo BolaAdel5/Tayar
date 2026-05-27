@@ -71,18 +71,96 @@ font-size:18px;
 
 <script>
 
-alert("JS WORKING");
+const supabaseUrl =
+'https://ckxljrwcsjmdflxyxxoc.supabase.co';
+
+const supabaseKey =
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNreGxqcndjc2ptZGZseHl4eG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzcwODYsImV4cCI6MjA5NTQ1MzA4Nn0.tMouJB-NI12ev-TX9AX41CQzOCLQ4wR3xh6I2GTqxe0';
+
+const client =
+supabase.createClient(
+supabaseUrl,
+supabaseKey
+);
 
 const btn =
 document.getElementById("sendBtn");
 
-btn.addEventListener("click", ()=>{
+btn.addEventListener("click", async ()=>{
 
-alert("BUTTON WORKING");
+const name =
+document.getElementById("name").value;
+
+const phone =
+document.getElementById("phone").value;
+
+if(!name || !phone){
+
+alert("اكتب البيانات");
+
+return;
+
+}
+
+navigator.geolocation.getCurrentPosition(
+
+async(position)=>{
+
+const orderNumber =
+Math.floor(1000 + Math.random()*9000);
+
+const { error } =
+await client
+
+.from("orders")
+
+.insert([{
+
+order_number: orderNumber,
+
+customer_name: name,
+
+phone: phone,
+
+customer_lat:
+position.coords.latitude,
+
+customer_lng:
+position.coords.longitude,
+
+status:"Pending"
+
+}]);
+
+if(error){
+
+console.log(error);
+
+alert(error.message);
+
+return;
+
+}
+
+alert("تم إنشاء الطلب");
+
+window.location.href =
+`track.html?order=${orderNumber}`;
+
+},
+
+(error)=>{
+
+console.log(error);
+
+alert("اسمح بالموقع");
+
+}
+
+);
 
 });
 
 </script>
-
 </body>
 </html>
